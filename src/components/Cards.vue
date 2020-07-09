@@ -1,14 +1,14 @@
 <template>
     <div class="cardMain">
-        <div class="card" v-for="dato in datos" :key="dato.id">
+        <div class="card" v-for="dato in datos" :key="dato.id" @click="$router.push({name: 'Artist'})">
             <div class="card__image">
-                <img :src="dato.img" class="card__image__img">
+                <img :src="dato.album.images[0].url" class="card__image__img">
             </div>
             <div class="card__songName">
-                <p>{{dato.songName}}</p>
+                <p>{{dato.name}}</p>
             </div>
             <div class="card__singer">
-                <p>{{dato.singer}}</p>
+                <p>{{dato.artists[0].name}}</p>
             </div>
         </div>
     </div>
@@ -17,18 +17,30 @@
 export default {
     data:function(){
         return {
-            datos:[
-                {id: 1, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 2, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 3, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 4, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 5, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 6, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'},
-                {id: 7, img: 'https://stopga.me/images/articles/2020/06/12/valorant_kak_igrat_za_sayfera-1591941375-s.jpg', songName: 'Nombre de la Cancion', singer: 'Cantante'}
-            ]
+            token: {},
+            datos: []
+        }
+    },
+    methods:{
+         getTracks(){
+            this.$http.get('https://api.spotify.com/v1/tracks',
+            {params:{
+                ids: '3f7gYMirBEKuc57218BjOY,4VrWlk8IQxevMvERoX08iC,27SdWb2rFzO6GWiYDBTD9j,1j4kHkkpqZRBwE0A4CN4Yv,1NpW5kyvO4XrNJ3rnfcNy3,0TDLuuLlV54CkRRUOahJb4,4E3afPSY5fUEelQS9ppL0e,1SgdUjvppHnIp6L7DZSnwc',
+                market: 'EE',},
+                headers:{
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+ this.token.access_token
+                }
+                })
+            .then(response =>{this.datos = response.data.tracks})
+        }
+    },
+        mounted(){
+            this.token = this.$route.query
+            this.getTracks()
         }
     }
-}
 </script>
 <style lang="scss">
 .cardMain{
@@ -39,7 +51,7 @@ export default {
     .card{
         margin: 10px;
         width: 15%;
-
+        cursor: pointer;
         &__image{
             width: 100%;
             height: 230px;
