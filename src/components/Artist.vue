@@ -108,9 +108,9 @@ export default {
         }
     },
     mounted(){
-        this.tokenRecived = this.$route.params.tok.access_token
+        this.tokenRecived = this.$route.params.tok
         this.idRecived = this.$route.params.id
-        this.token = this.$route.params.tok.access_token
+        this.token = this.$route.params.tok
         if (this.token != '') {
             this.getArtist()
         }

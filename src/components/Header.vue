@@ -38,7 +38,7 @@ export default {
         }
     },
     mounted(){
-        this.token = localStorage.getItem('token')
+        this.token = this.$route.query.access_token
     }
 }
 </script>

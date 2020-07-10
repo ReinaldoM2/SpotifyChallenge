@@ -57,7 +57,7 @@ export default {
         }
     },
     mounted(){
-        this.token = this.$route.token
+        this.token = this.$route.params.token
         this.recived = this.$route.params.txt
         this.search()
     }
