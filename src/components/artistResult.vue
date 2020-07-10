@@ -57,7 +57,7 @@ export default {
         }
     },
     mounted(){
-        this.token = localStorage.getItem('token')
+        this.token = this.$route.token
         this.recived = this.$route.params.txt
         this.search()
     }
