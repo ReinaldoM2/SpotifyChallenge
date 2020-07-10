@@ -18,22 +18,19 @@ import Cards from './Cards.vue'
 export default {
     components:{
         Cards
+        
     },
-    methods:{
-        getTracks(){
-            this.$http.get('https://api.spotify.com/v1/tracks',
-            {params:{
-                ids: '3f7gYMirBEKuc57218BjOY,4VrWlk8IQxevMvERoX08iC,27SdWb2rFzO6GWiYDBTD9j,1j4kHkkpqZRBwE0A4CN4Yv,1NpW5kyvO4XrNJ3rnfcNy3,0TDLuuLlV54CkRRUOahJb4,4E3afPSY5fUEelQS9ppL0e,1SgdUjvppHnIp6L7DZSnwc',
-                market: 'EE',},
-                headers:{
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+ this.token.access_token
-                    }
-                })
-            .then(response =>{this.datos = response.data})
+    data(){
+        return{
+            token: ''
         }
     },
+    mounted(){
+         this.token = localStorage.getItem('token')
+        if(!this.token){
+            localStorage.setItem('token', this.$route.query.access_token)
+        }
+    }
 }
 </script>
 <style lang="scss">

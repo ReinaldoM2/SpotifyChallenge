@@ -2,41 +2,44 @@
     <div class="artistMain">
         <div class="oneWorld">
             <div class="oneWorld__artistPhoto">
-                <img src="../assets/img/test.jpg" class="oneWorld__artistPhoto__photo">
+                <img :src="this.artist.images[0].url" class="oneWorld__artistPhoto__photo">
             </div>
-            <p class="oneWorld__artistName">{{artistName}}</p>
+            <p class="oneWorld__artistName">{{this.artist.name}}</p>
             <p class="about">About</p>
             <div class="division"></div>
             <div class="artistDescription">
-                <p class="artistDescription__Dsp">{{Descripcion}}</p>
+                <p class="artistDescription__Dsp">{{Descripcion}} <a :href="this.artist.external_urls.spotify">Spotify</a></p>
             </div>
             <div class="division"></div>
-            <p class="similar">Similar to {{artistName}}</p>
+            <p class="similar">Similar to {{this.artist.name}}</p>
             <div class="similarArtistContain">
-                <div class="similarArtist" v-for="photo in photos" :key="photo.id">
-                    <img :src="photo.url" alt="" class="similarArtistPhoto">
+                <div class="similarArtist" v-for="related in related_artist" :key="related.id">
+                    <img :src="related.images[0].url" alt="" class="similarArtistPhoto">
                 </div>
             </div>
         </div>
         <div class="twoWorld">
             <p class="twoWorld__albums">Albums</p>
             <div class="twoWorld__albumsContainer">
-                <div class="twoWorld__albumsCard" v-for="photo in photos" :key="photo.id">
-                    <img :src="photo.url" class="twoWorld__albumsCard__img">
-                    <p class="twoWorld__albumsCard__name">{{photo.name}}</p>
-                    <p class="twoWorld__albumsCard__date">{{photo.date}}</p>
+                <div class="twoWorld__albumsCard" v-for="album in albums" :key="album.id">
+                    <img :src="album.images[1]" class="twoWorld__albumsCard__img">
+                    <p class="twoWorld__albumsCard__name">{{album.name}}</p>
+                    <p class="twoWorld__albumsCard__date">{{album.release_date}}</p>
                 </div>
             </div>
             <p class="popularTracks">Most Popular Tracks</p>
             <div class="divisionTwo"></div>
             <div class="songsContainer">
-                <div class="songsContainer__song" v-for="photo in photos" :key="photo.id">
-                    <p class="songsContainer__song__id">{{photo.id}}</p>
+                <div class="songsContainer__song" v-for="popu in popularTracks" :key="popu.id">
+                    <!--<p class="songsContainer__song__id">{{popu.id}}</p>-->
                     <div class="songsContainer__song__details">
-                        <img :src="photo.url" class="songsContainer__song__details__img">
+                        <img :src="popu.album.images[0].url" class="songsContainer__song__details__img">
                         <div>
-                            <p class="songsContainer__song__details__songName">{{photo.songName}}</p>
-                            <p class="songsContainer__song__details__albumName">{{photo.name}}</p>
+                            <p class="songsContainer__song__details__songName">{{popu.name}}</p>
+                            <p class="songsContainer__song__details__albumName">{{popu.album.name}}</p>
+                        </div>
+                        <div class="songsContainer__song__details__durationContainer">
+                            <p class="songsContainer__song__details__durationContainer__duration">{{popu.duration_ms}}</p>
                         </div>
                     </div>
                 </div>
@@ -48,15 +51,75 @@
 export default {
     data:function(){
         return{
-            artistName: 'Nombre Prueba',
-            Descripcion: 'Esta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el textoEsta es una descripcion de el texto',
-            photos:[
-                {id: 1, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Album', date: '1998' , songName: "Nombre Cancion"},
-                {id: 2, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Album', date: '1998' , songName: "Nombre Cancion"},
-                {id: 3, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Album', date: '1998' , songName: "Nombre Cancion"},
-                {id: 4, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Album', date: '1998' , songName: "Nombre Cancion"}
-            ]     
+            Descripcion: 'Spotify por medio de la API no envia la descripcion de los artistas, por lo contrario puedes dar Click para redirigirte a la pagina de spotify y disfrutar su descripcion.',
+            idRecived: {},
+            tokenRecived: {},
+            token: {},
+            artist: [],
+            albums: [],
+            related_artist: [],
+            popularTracks: [],
+            duration: {}
        }
+    },
+    methods:{
+        getArtist(){
+            if (this.idRecived != '') {
+                this.$http.get('https://api.spotify.com/v1/artists/' + this.idRecived,
+                {params:{ id: this.idRecived},
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+ this.token
+                    }
+                    })
+                .then(response =>{this.artist = response.data})
+            }
+        },
+        getArtistAlbums(){
+            this.$http.get('https://api.spotify.com/v1/artists/' + this.idRecived + '/albums',
+                {params: { id: this.idRecived, market: 'EE', include_groups: 'single', limit: 5},
+                    headers:{
+                       'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+ this.token 
+                    }}).then(response=>{this.albums = response.data.items})
+        },
+         getRelatedArtist(){
+            this.$http.get('https://api.spotify.com/v1/artists/' + this.idRecived + '/related-artists',
+                { params: {id : this.idRecived},
+                    headers:{
+                       'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+ this.token 
+                    }}).then(response=>{this.related_artist = response.data.artists})
+        },
+        getPopularTracksOfArtist(){
+            this.$http.get('https://api.spotify.com/v1/artists/' + this.idRecived + '/top-tracks',
+                { params: {id : this.idRecived, country: 'EE'},
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+ this.token 
+                    }}).then(response=>{this.popularTracks = response.data.tracks})
+        },
+        getDuration(){
+            alert('Tengo duracion')
+        }
+    },
+    mounted(){
+        this.tokenRecived = this.$route.params.tok.access_token
+        this.idRecived = this.$route.params.id
+        this.token = this.$route.params.tok.access_token
+        if (this.token != '') {
+            this.getArtist()
+        }
+        this.getArtistAlbums()
+        this.getRelatedArtist()
+        this.getPopularTracksOfArtist()
+        if (this.popularTracks != '') {
+            this.getDuration()
+        }
     }
 }
 </script>
@@ -149,6 +212,7 @@ export default {
     display: flex;
     width: 77%;
     margin-left: 16%;
+    flex-wrap: wrap;
 }
 
 .similarArtist{
@@ -270,6 +334,19 @@ export default {
                 margin-left: 11px;
                 font-size: 11px;
             }
+
+            &__durationContainer{
+                position: absolute;
+                left: 90%;
+
+                    
+                &__duration{
+                    margin: 0;
+                    color: #d1d1d4;
+                    font-size: 17px;
+                }
+            }
+
         }
     }
 }

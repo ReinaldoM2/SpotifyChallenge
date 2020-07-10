@@ -17,21 +17,28 @@
 export default {
     data: function(){
         return{
+            token: '',
             artist: '',
-            song: ''
+            song: '',
+            artisT: [],
+            songS:[]
         }
     },
     methods: {
         search(){
-            if (this.artist != '') {
-                this.$router.push({name:'artistResult', params:{txt:this.artist}})
-            }
+          if (this.artist != '') {this.$router.push({name: 'artistResult', params:{txt:this.artist, token: this.token}})
+          this.artist = ''
+          }
         },
         searchSong(){
-            if (this.song != '') {
-                this.$router.push({name: 'songResult'})
-            }
+          if (this.song != '') {
+          this.$router.push({name: 'songResult', params:{txt:this.song, token: this.token}})
+          this.song = ''
+          }
         }
+    },
+    mounted(){
+        this.token = localStorage.getItem('token')
     }
 }
 </script>

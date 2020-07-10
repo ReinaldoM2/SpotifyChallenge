@@ -5,7 +5,7 @@ import songResult from './components/songResult'
 
 export const routes = [
     { path: '/', name: 'Home', component: Home},
-    { path: '/artist' ,name: 'Artist', component: Artist},
+    { path: '/artist/:id' ,name: 'Artist', component: Artist},
     { path: '/artistResult', name: 'artistResult', component: artistResult},
     { path: '/songResult', name: 'songResult', component: songResult}
 ]

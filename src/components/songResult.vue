@@ -10,11 +10,16 @@
             </div>
         </div>
         <div class="songContainer">
-            <div class="songCard" v-for="photo in photos" :key="photo.id" @click="artist(photo.id)">
+            <div class="songCard" v-for="sn in songS" :key="sn.id" @click="artist(sn.id)">
                 <div class="songDetail">
-                    <img :src="photo.url" class="songPhoto">
-                    <p class="songName">{{ photo.songName }}</p>
-                    <p class="artistName">{{ photo.name }}</p>
+                    <div v-if="sn.album.images != ''">
+                         <img :src="sn.album.images[0].url" class="songPhoto">
+                    </div>
+                    <div v-else>
+                        <img src="https://www.agora-gallery.com/advice/wp-content/uploads/2015/10/image-placeholder-300x200.png" class="songPhoto">
+                    </div>
+                    <p class="songName">{{ sn.name }}</p>
+                    <p class="artistName">{{ sn.artists[0].name }}</p>
                 </div>
                 <div class="songReproducer">
                 </div>
@@ -24,20 +29,39 @@
 </template>
 <script>
 export default {
-        data:function(){
+     data:function(){
         return{
-             photos:[
-                {id: 1, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 2, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 3, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 4, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 5, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 6, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 7, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-                {id: 8, url: 'https://codigoesports.com/wp-content/uploads/2020/05/VALORANT_Jett.jpg', name: 'Nombre Artista', songName: 'Nombre Cancion'},
-            ]     
+            token: '',
+            recived: {},
+            songS: []
         }
     },
+    methods:{
+         search(){
+            this.$http.get('https://api.spotify.com/v1/search',
+                {   
+                    params:{
+                        q: this.recived,
+                        type: 'track',
+                    },
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.token,
+                    }
+                }).then(
+                response=>{
+                    console.log(response)
+                    this.songS = response.body.tracks.items
+                }
+            )
+        },
+    },
+    mounted(){
+        this.token = localStorage.getItem('token')
+        this.recived = this.$route.params.txt
+        this.search()
+    }
 }
 </script>
 <style lang="scss">

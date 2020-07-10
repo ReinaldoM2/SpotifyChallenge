@@ -1,8 +1,8 @@
 <template>
     <div class="cardMain">
-        <div class="card" v-for="dato in datos" :key="dato.id" @click="$router.push({name: 'Artist'})">
+        <div class="card" v-for="dato in datos" :key="dato.id" @click="postSongID(dato.artists[0].id)">
             <div class="card__image">
-                <img :src="dato.album.images[0].url" class="card__image__img">
+                <img :src="dato.images[0].url" class="card__image__img">
             </div>
             <div class="card__songName">
                 <p>{{dato.name}}</p>
@@ -17,27 +17,30 @@
 export default {
     data:function(){
         return {
-            token: {},
+            token: '',
             datos: []
         }
     },
     methods:{
          getTracks(){
-            this.$http.get('https://api.spotify.com/v1/tracks',
+            this.$http.get('https://api.spotify.com/v1/browse/new-releases',
             {params:{
-                ids: '3f7gYMirBEKuc57218BjOY,4VrWlk8IQxevMvERoX08iC,27SdWb2rFzO6GWiYDBTD9j,1j4kHkkpqZRBwE0A4CN4Yv,1NpW5kyvO4XrNJ3rnfcNy3,0TDLuuLlV54CkRRUOahJb4,4E3afPSY5fUEelQS9ppL0e,1SgdUjvppHnIp6L7DZSnwc',
-                market: 'EE',},
+                country: 'EE',},
                 headers:{
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+ this.token.access_token
+                    'Authorization': 'Bearer '+ this.token
                 }
                 })
-            .then(response =>{this.datos = response.data.tracks})
+            .then(response =>{this.datos = response.data.albums.items})
+        },
+
+        postSongID(id){
+            this.$router.push({name: 'Artist', params: {id: id, tok:this.token}})
         }
     },
         mounted(){
-            this.token = this.$route.query
+            this.token = localStorage.getItem('token')
             this.getTracks()
         }
     }
